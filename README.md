@@ -21,6 +21,7 @@ A good place to start:
 - Then copy your recorded macro into the function section
 - You will need to generalize some of your recorded macro so it will work
 - Add `setBatchMode(true);` before `processFolder(input);` to speed up your macro (ImageJ will not display images as it works)
+  - See my [example script] to view this
 
 ## Resources
 [Image.sc Forum](https://forum.image.sc/) - Great resource for ImageJ and other image analysis questions. I am `@boonepeter` on there
