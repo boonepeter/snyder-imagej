@@ -1,5 +1,5 @@
 # snyder-imagej
-A repository containing ImageJ macros for the Snyder lab. 
+A repository containing ImageJ macros for the [Snyder Lab](https://surgery.duke.edu/faculty/joshua-clair-snyder-phd). 
 
 imagej-macros are written in imagej macro language
 
