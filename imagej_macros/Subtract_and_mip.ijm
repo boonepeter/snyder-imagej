@@ -3,10 +3,9 @@
  * 
  * 1. Open image
  * 2. If subtract:
- * 		a. Duplicate
- * 		b. Subtract all other channels from each channel
- * 		c. Skip brightfield channels
- * 		d. Merge and save subtracted
+ * 		a. Subtract all other channels from each channel
+ * 		b. Skip brightfield channels
+ * 		c. Merge and save subtracted
  * 	3. If Z project
  * 		a. Project image
  * 		b. Save
@@ -54,28 +53,27 @@ function processFile(input, output, file, brightfield, zproj, typeOfZproj, subtr
 	
 	print("Opening: " + input + File.separator + file);
 	
-	run("Bio-Formats Windowless Importer", "open=" + input + File.separator + file);
+	run("Bio-Formats Windowless Importer", "open=[" + input + File.separator + file + "]");
 	if(subtract){
 		print("Subtracting...");
-		run("Duplicate...", "duplicate");
-		titles = getList("image.titles");
-		selectWindow(titles[0]);
-		run("Split Channels");
-		selectWindow(titles[1]);
 		run("Split Channels");
 		bf = brightfield - 1;
 		titles = getList("image.titles");
-		chan = titles.length/2;
 		final_channels = "";
-		for (i = 0; i < chan; i++) {
-			final_channels = final_channels + "c" + (i + 1) + "=" + titles[i] + " ";
+		for (i = 0; i < titles.length; i++) {
+			curWindow = titles[i];
 			if (i != bf) {
-				for (j = 0; j < chan; j++){
+				for (j = 0; j < titles.length; j++){
 					if (j!=i && j!=bf){
-						imageCalculator("Subtract stack", titles[i], titles[j + chan]);
+						imageCalculator("Subtract stack create", curWindow, titles[j]);
+						curWindow = getTitle();
+					}else{
+						print(j);
 					}
 				}
 			}
+			chan = i + 1;
+			final_channels = final_channels + "c" + chan + "=[" + curWindow + "] ";
 		}
 		run("Merge Channels...", final_channels + "create");
 		saveAs("Tiff", output + File.separator + "Sub_" + file);
