@@ -1,11 +1,24 @@
 /*
+ * This macro will run through a directory and do the following to items that have the correct suffix:
  * 
+ * 1. Open image
+ * 2. If subtract:
+ * 		a. Duplicate
+ * 		b. Subtract all other channels from each channel
+ * 		c. Skip brightfield channels
+ * 		d. Merge and save subtracted
+ * 	3. If Z project
+ * 		a. Project image
+ * 		b. Save
+ * 	
+ * 	If you don't have a brightfield, select 0
+ * 	
  */
 
 #@ File (label = "Input directory", style = "directory") input
 #@ File (label = "Output directory", style = "directory") output
-#@ String (label = "File suffix", value = ".tif") suffix
-#@ Integer (label = "Brightfield") brightfield
+#@ String (label = "File suffix", value = ".czi") suffix
+#@ Integer (label = "Brightfield", value = 0, description = "Set to 0 to ignore") brightfield
 #@ Boolean (label = "Subtract channels?") subtract
 #@ Boolean (label = "Zproject?") zproj
 #@ String (label = "Type of Z project", choices = {"Average Intensity", "Max Intensity", "Min Intensity", "Sum Slices", "Standard Deviation", "Median"}) typeOfZproj
@@ -65,7 +78,7 @@ function processFile(input, output, file, brightfield, zproj, typeOfZproj, subtr
 			}
 		}
 		run("Merge Channels...", final_channels + "create");
-		saveAs("Tiff", output + File.separator + "Sub_" + file);	
+		saveAs("Tiff", output + File.separator + "Sub_" + file);
 	}
 	
 	if(zproj) {
