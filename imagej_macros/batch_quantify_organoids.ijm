@@ -1,13 +1,37 @@
 /*
- * Macro template to process multiple images in a folder
+ * Using macro template to process folders.
+ * 
+ * This macro was used to process organoid images for veronica. 
+ * 
+ * It assumes a few things:
+ *    There are 4 channels
+ *    Brightfield is channel #2
+ *    mko channel is #3 (uses a different threshold method for mko)
+ * 
+ * What this macro does:
+ * 1. Open image
+ * 2. Sum the fluorescent channels together
+ * 3. Z project the sum
+ * 4. Blur
+ * 5. Threshold
+ * 6. Erode 4x
+ * 7. Analyze particles
+ * 8. Overlay back on original stack, save stack
+ * 9. For each fluorescent channel:
+ *    a. Threshold
+ *    b. Overlay ROI
+ *    c. Measure
+ *    d. Save results as csv
+ * 
+ *    
+ * 
  */
 
 #@ File (label = "Input directory", style = "directory") input
 #@ File (label = "Output directory", style = "directory") output
 #@ String (label = "File suffix", value = ".tif") suffix
 
-// See also Process_Folder.py for a version of this code
-// in the Python scripting language.
+
 setBatchMode(true);
 processFolder(input);
 
@@ -24,8 +48,6 @@ function processFolder(input) {
 }
 
 function processFile(input, output, file) {
-	// Do the processing here by adding your own code.
-	// Leave the print statements until things work, then remove them.
 	print("Processing: " + input + File.separator + file);
 	
 	BF = 2; //brightfield
@@ -62,7 +84,7 @@ function processFile(input, output, file) {
 	
 	run("Merge Channels...", "c1=[" + images[0] + "] c2=[" + images[1] + "] c3=[" + images[2] + "] c4=[" + images[3] + "] create keep");
 	run("From ROI Manager");
-	saveAs("Tif", output + File.separator + maintitle + "_raw" + ".tif");
+	saveAs("Tif", output + File.separator + maintitle + "_raw_roi" + ".tif");
 	close();
 	
 	for (i = 0; i < nChannels; i++) {
@@ -73,7 +95,8 @@ function processFile(input, output, file) {
 		if(nSlices > 1){
 			run("Z Project...", "projection=[Max Intensity]");	
 		}
-		
+
+		//use different threshold method for mko channel
 		if (i == 2){
 			run("Convert to Mask", "method=MaxEntropy background=Dark calculate black");
 		}else {

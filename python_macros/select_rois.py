@@ -14,15 +14,17 @@ https://forum.image.sc/t/select-rois-in-the-roi-manager-according-to-the-measure
 
 from ij.plugin.frame import RoiManager
 
-threshold = 200
+
 rm = RoiManager.getInstance()
 selected = []
 
 for i in range(rm.getCount()):
     roi = rm.getRoi(i)
     imp.setRoi(roi)
-    if imp.getStatistics().area > threshold:
+    #You can get any statistics from this list: https://imagej.nih.gov/ij/developer/api/ij/process/ImageStatistics.html
+    if imp.getStatistics().area < 10:
         selected.append(i)
 
 rm.setSelectedIndexes(selected)
-
+#this deletes the selected rois
+rm.runCommand("Delete")
